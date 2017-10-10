@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="IyzicoSuite">
+    <test name="AutomationProjectSampleSet" preserve-order="true">
+        <classes>
+            <class name="main.java.iyzico.com.testcases.login.MerchantAdminLogin"></class>
+            <class name="main.java.iyzico.com.testcases.registration.MerchantAdminRegistration"></class>
+            <class name="main.java.iyzico.com.testcases.profile.ProfileUpdate"></class>
+            <class name="main.java.iyzico.com.testcases.settings.Settings"></class>
+        </classes>
+    </test>
+</suite>

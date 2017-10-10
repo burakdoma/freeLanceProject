@@ -1,0 +1,20 @@
+Deadline: 31 Ağustos 2016
+
+Techs allowed: ScalaTest, Groovy Spock, Node.js Nightwatch, Phantomjs, Java
+
+Merchant Admin Panel: https://sandbox-merchant.iyzipay.com/login
+- Kayıt Ol
+- Giriş Yap
+- Ayarlar Bölümünde
+    - API Anahtarlarının olup olmadığını
+    - Bilgilerim kısmını güncelleme
+    - İşyeri Bilgilerim Logo güncelleme
+    - Ödeme Bazında 3D Secure Ayarları bölümünde Tutar güncelleme
+
+Profil sayfası: https://sandbox-merchant.iyzipay.com/profile
+- Ad, Soyad,  Gsm Numarası güncelleme
+- Şifre Değiştirme
+
++ Ve senin test yazmak istediğin sayfalar olur ise yazabilirsin.
+
+- Github üzerinden host & share //
