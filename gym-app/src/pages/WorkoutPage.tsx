@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Trash2, Timer, Check, Save, ChevronDown, ChevronUp } from 'lucide-react'
+import { Plus, Trash2, Timer, Check, Save, ChevronDown, ChevronUp, Dumbbell } from 'lucide-react'
 import { v4 } from '../lib/uuid'
 import ExercisePicker from '../components/ExercisePicker'
 import RestTimer from '../components/RestTimer'
@@ -107,8 +107,8 @@ export default function WorkoutPage() {
 
   if (activeWorkout) {
     return (
-      <div className="pb-20">
-        <div className="sticky top-0 z-10 border-b border-[var(--color-surface-2)] bg-[var(--color-bg)] px-4 py-3">
+      <div className="pb-24">
+        <div className="sticky top-0 z-10 border-b border-surface-2 bg-bg/95 px-5 py-4 backdrop-blur-sm">
           <div className="flex items-center justify-between">
             <input
               value={activeWorkout.name}
@@ -118,13 +118,13 @@ export default function WorkoutPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setShowTimer(true)}
-                className="rounded-lg bg-[var(--color-surface)] p-2 text-[var(--color-accent)]"
+                className="rounded-xl bg-surface p-2.5 text-accent transition-colors hover:bg-surface-2"
               >
                 <Timer size={20} />
               </button>
               <button
                 onClick={finishWorkout}
-                className="flex items-center gap-1 rounded-lg bg-[var(--color-success)] px-3 py-2 text-sm font-semibold text-black"
+                className="flex items-center gap-1.5 rounded-xl bg-success px-4 py-2.5 text-sm font-bold text-black shadow-lg shadow-success/25 active:scale-[0.97] transition-transform"
               >
                 <Save size={16} /> Finish
               </button>
@@ -132,11 +132,11 @@ export default function WorkoutPage() {
           </div>
         </div>
 
-        <div className="space-y-4 p-4">
+        <div className="space-y-4 p-5">
           {activeWorkout.exercises.map((ex, exIdx) => (
-            <div key={ex.id} className="rounded-xl bg-[var(--color-surface)] p-4">
-              <h3 className="mb-3 font-semibold text-[var(--color-primary-light)]">{ex.exerciseName}</h3>
-              <div className="mb-2 grid grid-cols-[2rem_1fr_1fr_2rem_2rem] items-center gap-2 text-xs font-medium text-[var(--color-text-muted)]">
+            <div key={ex.id} className="rounded-2xl bg-surface p-4 shadow-lg shadow-black/10">
+              <h3 className="mb-3 font-bold text-primary-light">{ex.exerciseName}</h3>
+              <div className="mb-2 grid grid-cols-[2rem_1fr_1fr_2rem_2rem] items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-muted">
                 <span>Set</span>
                 <span>kg</span>
                 <span>Reps</span>
@@ -150,13 +150,13 @@ export default function WorkoutPage() {
                     set.completed ? 'opacity-60' : ''
                   }`}
                 >
-                  <span className="text-center text-sm text-[var(--color-text-muted)]">{setIdx + 1}</span>
+                  <span className="text-center text-sm text-muted">{setIdx + 1}</span>
                   <input
                     type="number"
                     inputMode="decimal"
                     value={set.weight || ''}
                     onChange={(e) => updateSet(exIdx, setIdx, 'weight', parseFloat(e.target.value) || 0)}
-                    className="rounded-lg bg-[var(--color-surface-2)] px-2 py-1.5 text-center text-sm text-[var(--color-text)] outline-none"
+                    className="rounded-lg bg-surface-2 px-2 py-1.5 text-center text-sm text-text outline-none"
                     placeholder="0"
                   />
                   <input
@@ -164,22 +164,22 @@ export default function WorkoutPage() {
                     inputMode="numeric"
                     value={set.reps || ''}
                     onChange={(e) => updateSet(exIdx, setIdx, 'reps', parseInt(e.target.value) || 0)}
-                    className="rounded-lg bg-[var(--color-surface-2)] px-2 py-1.5 text-center text-sm text-[var(--color-text)] outline-none"
+                    className="rounded-lg bg-surface-2 px-2 py-1.5 text-center text-sm text-text outline-none"
                     placeholder="0"
                   />
                   <button
                     onClick={() => updateSet(exIdx, setIdx, 'completed', !set.completed)}
                     className={`flex h-8 w-8 items-center justify-center rounded-lg ${
                       set.completed
-                        ? 'bg-[var(--color-success)] text-black'
-                        : 'bg-[var(--color-surface-2)] text-[var(--color-text-muted)]'
+                        ? 'bg-success text-black'
+                        : 'bg-surface-2 text-muted'
                     }`}
                   >
                     <Check size={16} />
                   </button>
                   <button
                     onClick={() => removeSet(exIdx, setIdx)}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--color-danger)]"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg text-danger"
                   >
                     <Trash2 size={14} />
                   </button>
@@ -187,7 +187,7 @@ export default function WorkoutPage() {
               ))}
               <button
                 onClick={() => addSet(exIdx)}
-                className="mt-2 w-full rounded-lg bg-[var(--color-surface-2)] py-2 text-xs font-medium text-[var(--color-text-muted)]"
+                className="mt-3 w-full rounded-xl bg-surface-2 py-2.5 text-xs font-semibold text-muted transition-colors hover:text-text"
               >
                 + Add Set
               </button>
@@ -196,7 +196,7 @@ export default function WorkoutPage() {
 
           <button
             onClick={() => setShowPicker(true)}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[var(--color-surface-2)] py-4 text-sm font-medium text-[var(--color-primary-light)]"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-surface-2 py-5 text-sm font-semibold text-primary-light transition-colors hover:border-primary hover:text-primary"
           >
             <Plus size={18} /> Add Exercise
           </button>
@@ -209,32 +209,35 @@ export default function WorkoutPage() {
   }
 
   return (
-    <div className="p-4 pb-20">
-      <h1 className="mb-4 text-2xl font-bold">Workout</h1>
+    <div className="p-5 pb-24">
+      <h1 className="mb-1 text-2xl font-extrabold tracking-tight">Workout</h1>
+      <p className="mb-5 text-sm text-muted">Track your lifts and crush your goals</p>
       <button
         onClick={startNewWorkout}
-        className="mb-6 flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--color-primary)] py-4 text-base font-semibold text-white"
+        className="mb-8 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary to-primary-light py-4 text-base font-bold text-white shadow-lg shadow-primary/25 active:scale-[0.98] transition-transform"
       >
         <Plus size={20} /> Start New Workout
       </button>
 
       {workouts.length === 0 ? (
-        <div className="py-12 text-center">
-          <Dumbbell size={48} className="mx-auto mb-3 text-[var(--color-surface-2)]" />
-          <p className="text-[var(--color-text-muted)]">No workouts yet. Start your first one!</p>
+        <div className="py-16 text-center">
+          <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-surface">
+            <Dumbbell size={36} className="text-muted" />
+          </div>
+          <p className="text-muted">No workouts yet. Start your first one!</p>
         </div>
       ) : (
         <div className="space-y-3">
-          <h2 className="text-lg font-semibold text-[var(--color-text-muted)]">History</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-muted">History</h2>
           {workouts.map((w) => (
-            <div key={w.id} className="rounded-xl bg-[var(--color-surface)] p-4">
+            <div key={w.id} className="rounded-2xl bg-surface p-4 shadow-lg shadow-black/10">
               <button
                 onClick={() => setExpandedWorkout(expandedWorkout === w.id ? null : w.id)}
                 className="flex w-full items-center justify-between"
               >
                 <div className="text-left">
-                  <div className="font-semibold">{w.name}</div>
-                  <div className="text-xs text-[var(--color-text-muted)]">
+                  <div className="font-bold">{w.name}</div>
+                  <div className="mt-0.5 text-xs text-muted">
                     {format(new Date(w.date), 'MMM d, yyyy')} &middot; {w.duration} min &middot;{' '}
                     {w.exercises.length} exercises
                   </div>
@@ -242,12 +245,12 @@ export default function WorkoutPage() {
                 {expandedWorkout === w.id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
               </button>
               {expandedWorkout === w.id && (
-                <div className="mt-3 space-y-2 border-t border-[var(--color-surface-2)] pt-3">
+                <div className="mt-3 space-y-2 border-t border-surface-2 pt-3">
                   {w.exercises.map((ex) => (
                     <div key={ex.id}>
-                      <div className="text-sm font-medium text-[var(--color-primary-light)]">{ex.exerciseName}</div>
+                      <div className="text-sm font-medium text-primary-light">{ex.exerciseName}</div>
                       {ex.sets.map((s, i) => (
-                        <div key={s.id} className="ml-2 text-xs text-[var(--color-text-muted)]">
+                        <div key={s.id} className="ml-2 text-xs text-muted">
                           Set {i + 1}: {s.weight}kg x {s.reps} reps
                         </div>
                       ))}
@@ -255,7 +258,7 @@ export default function WorkoutPage() {
                   ))}
                   <button
                     onClick={() => handleDeleteWorkout(w.id)}
-                    className="mt-2 flex items-center gap-1 text-xs text-[var(--color-danger)]"
+                    className="mt-2 flex items-center gap-1 text-xs text-danger"
                   >
                     <Trash2 size={12} /> Delete
                   </button>
@@ -268,6 +271,3 @@ export default function WorkoutPage() {
     </div>
   )
 }
-
-// Need Dumbbell for empty state
-import { Dumbbell } from 'lucide-react'

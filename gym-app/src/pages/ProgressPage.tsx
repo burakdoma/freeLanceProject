@@ -86,15 +86,17 @@ export default function ProgressPage() {
     contentStyle: {
       backgroundColor: 'var(--color-surface)',
       border: '1px solid var(--color-surface-2)',
-      borderRadius: '8px',
+      borderRadius: '12px',
       color: 'var(--color-text)',
       fontSize: '12px',
+      padding: '8px 12px',
     },
   }
 
   return (
-    <div className="p-4 pb-20">
-      <h1 className="mb-4 text-2xl font-bold">Progress</h1>
+    <div className="p-5 pb-24">
+      <h1 className="mb-1 text-2xl font-extrabold tracking-tight">Progress</h1>
+      <p className="mb-5 text-sm text-muted">Your training at a glance</p>
 
       {/* Stats cards */}
       <div className="mb-6 grid grid-cols-2 gap-3">
@@ -105,32 +107,34 @@ export default function ProgressPage() {
       </div>
 
       {workouts.length === 0 ? (
-        <div className="py-12 text-center">
-          <TrendingUp size={48} className="mx-auto mb-3 text-[var(--color-surface-2)]" />
-          <p className="text-[var(--color-text-muted)]">Complete your first workout to see progress!</p>
+        <div className="py-16 text-center">
+          <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-surface">
+            <TrendingUp size={36} className="text-muted" />
+          </div>
+          <p className="text-muted">Complete your first workout to see progress!</p>
         </div>
       ) : (
         <>
           {/* Weekly Volume Chart */}
-          <div className="mb-6 rounded-xl bg-[var(--color-surface)] p-4">
-            <h2 className="mb-3 text-sm font-semibold text-[var(--color-text-muted)]">Weekly Volume (kg)</h2>
+          <div className="mb-4 rounded-2xl bg-surface p-5 shadow-lg shadow-black/10">
+            <h2 className="mb-4 text-xs font-bold uppercase tracking-widest text-muted">Weekly Volume (kg)</h2>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={weeklyVolume}>
-                <XAxis dataKey="week" tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }} axisLine={false} tickLine={false} />
+                <XAxis dataKey="week" tick={{ fontSize: 10, fill: 'var(--color-muted)' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: 'var(--color-muted)' }} axisLine={false} tickLine={false} />
                 <Tooltip {...tooltipStyle} />
-                <Bar dataKey="volume" fill="var(--color-primary)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="volume" fill="var(--color-primary)" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
           {/* Weekly Frequency */}
-          <div className="mb-6 rounded-xl bg-[var(--color-surface)] p-4">
-            <h2 className="mb-3 text-sm font-semibold text-[var(--color-text-muted)]">Workouts Per Week</h2>
+          <div className="mb-4 rounded-2xl bg-surface p-5 shadow-lg shadow-black/10">
+            <h2 className="mb-4 text-xs font-bold uppercase tracking-widest text-muted">Workouts Per Week</h2>
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={weeklyCount}>
-                <XAxis dataKey="week" tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: 'var(--color-text-muted)' }} axisLine={false} tickLine={false} allowDecimals={false} />
+                <XAxis dataKey="week" tick={{ fontSize: 10, fill: 'var(--color-muted)' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: 'var(--color-muted)' }} axisLine={false} tickLine={false} allowDecimals={false} />
                 <Tooltip {...tooltipStyle} />
                 <Line type="monotone" dataKey="count" stroke="var(--color-accent)" strokeWidth={2} dot={{ fill: 'var(--color-accent)', r: 4 }} />
               </LineChart>
@@ -139,20 +143,20 @@ export default function ProgressPage() {
 
           {/* Top exercises */}
           {topExercises.length > 0 && (
-            <div className="rounded-xl bg-[var(--color-surface)] p-4">
-              <h2 className="mb-3 text-sm font-semibold text-[var(--color-text-muted)]">Top Exercises by Volume</h2>
-              <div className="space-y-2">
+            <div className="rounded-2xl bg-surface p-5 shadow-lg shadow-black/10">
+              <h2 className="mb-4 text-xs font-bold uppercase tracking-widest text-muted">Top Exercises by Volume</h2>
+              <div className="space-y-3">
                 {topExercises.map((e, i) => {
                   const maxVol = topExercises[0].volume
                   return (
                     <div key={e.name}>
-                      <div className="mb-0.5 flex justify-between text-xs">
-                        <span className="font-medium">{i + 1}. {e.name}</span>
-                        <span className="text-[var(--color-text-muted)]">{(e.volume / 1000).toFixed(1)}t</span>
+                      <div className="mb-1 flex justify-between text-xs">
+                        <span className="font-semibold">{i + 1}. {e.name}</span>
+                        <span className="text-muted">{(e.volume / 1000).toFixed(1)}t</span>
                       </div>
-                      <div className="h-2 overflow-hidden rounded-full bg-[var(--color-surface-2)]">
+                      <div className="h-2.5 overflow-hidden rounded-full bg-surface-2">
                         <div
-                          className="h-full rounded-full bg-[var(--color-primary)]"
+                          className="h-full rounded-full bg-gradient-to-r from-primary to-primary-light transition-all duration-500"
                           style={{ width: `${(e.volume / maxVol) * 100}%` }}
                         />
                       </div>
@@ -170,10 +174,10 @@ export default function ProgressPage() {
 
 function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string; color: string }) {
   return (
-    <div className="rounded-xl bg-[var(--color-surface)] p-4">
+    <div className="rounded-2xl bg-surface p-4 shadow-lg shadow-black/10">
       <div className="mb-2" style={{ color }}>{icon}</div>
-      <div className="text-2xl font-bold">{value}</div>
-      <div className="text-xs text-[var(--color-text-muted)]">{label}</div>
+      <div className="text-2xl font-extrabold">{value}</div>
+      <div className="mt-0.5 text-xs font-medium text-muted">{label}</div>
     </div>
   )
 }

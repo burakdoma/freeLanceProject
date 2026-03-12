@@ -41,46 +41,46 @@ export default function RestTimer({ onClose }: Props) {
   const progress = seconds > 0 ? (remaining / seconds) * 100 : 0
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-      <div className="w-full max-w-sm rounded-2xl bg-[var(--color-surface)] p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-bold">Rest Timer</h3>
-          <button onClick={onClose} className="text-[var(--color-text-muted)]">
-            <X size={22} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-5 backdrop-blur-sm">
+      <div className="w-full max-w-sm rounded-3xl bg-surface p-6 shadow-2xl shadow-black/30">
+        <div className="mb-5 flex items-center justify-between">
+          <h3 className="text-lg font-extrabold">Rest Timer</h3>
+          <button onClick={onClose} className="rounded-xl bg-surface-2 p-2 text-muted">
+            <X size={20} />
           </button>
         </div>
 
-        <div className="relative mx-auto mb-6 flex h-40 w-40 items-center justify-center">
-          <svg className="absolute inset-0 -rotate-90" viewBox="0 0 160 160">
-            <circle cx="80" cy="80" r="70" fill="none" stroke="var(--color-surface-2)" strokeWidth="8" />
+        <div className="relative mx-auto mb-6 flex h-44 w-44 items-center justify-center">
+          <svg className="absolute inset-0 -rotate-90" viewBox="0 0 176 176">
+            <circle cx="88" cy="88" r="80" fill="none" stroke="var(--color-surface-2)" strokeWidth="8" />
             <circle
-              cx="80"
-              cy="80"
-              r="70"
+              cx="88"
+              cy="88"
+              r="80"
               fill="none"
               stroke={remaining === 0 ? 'var(--color-success)' : 'var(--color-primary)'}
               strokeWidth="8"
               strokeLinecap="round"
-              strokeDasharray={`${2 * Math.PI * 70}`}
-              strokeDashoffset={`${2 * Math.PI * 70 * (1 - progress / 100)}`}
+              strokeDasharray={`${2 * Math.PI * 80}`}
+              strokeDashoffset={`${2 * Math.PI * 80 * (1 - progress / 100)}`}
               className="transition-all duration-1000"
             />
           </svg>
-          <span className={`text-4xl font-bold ${remaining === 0 ? 'text-[var(--color-success)]' : ''}`}>
+          <span className={`text-5xl font-extrabold tabular-nums ${remaining === 0 ? 'text-success' : ''}`}>
             {formatTime(remaining)}
           </span>
         </div>
 
-        <div className="mb-4 flex justify-center gap-3">
+        <div className="mb-5 flex justify-center gap-4">
           <button
             onClick={() => setRunning(!running)}
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-primary)] text-white"
+            className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/30 active:scale-95 transition-transform"
           >
-            {running ? <Pause size={22} /> : <Play size={22} />}
+            {running ? <Pause size={24} /> : <Play size={24} />}
           </button>
           <button
             onClick={reset}
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-surface-2)] text-[var(--color-text-muted)]"
+            className="flex h-14 w-14 items-center justify-center rounded-full bg-surface-2 text-muted active:scale-95 transition-transform"
           >
             <RotateCcw size={22} />
           </button>
@@ -91,10 +91,10 @@ export default function RestTimer({ onClose }: Props) {
             <button
               key={p}
               onClick={() => { setSeconds(p); setRemaining(p); setRunning(false) }}
-              className={`rounded-full px-3 py-1 text-xs font-medium ${
+              className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all ${
                 seconds === p
-                  ? 'bg-[var(--color-primary)] text-white'
-                  : 'bg-[var(--color-surface-2)] text-[var(--color-text-muted)]'
+                  ? 'bg-primary text-white shadow-md shadow-primary/30'
+                  : 'bg-surface-2 text-muted'
               }`}
             >
               {p < 60 ? `${p}s` : p % 60 === 0 ? `${p / 60}m` : `${Math.floor(p / 60)}:${(p % 60).toString().padStart(2, '0')}`}

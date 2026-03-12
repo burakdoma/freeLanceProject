@@ -23,31 +23,31 @@ export default function ExercisePicker({ onSelect, onClose }: Props) {
   })
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[var(--color-bg)]">
-      <div className="flex items-center gap-2 border-b border-[var(--color-surface-2)] p-4">
-        <div className="flex flex-1 items-center gap-2 rounded-lg bg-[var(--color-surface)] px-3 py-2">
-          <Search size={18} className="text-[var(--color-text-muted)]" />
+    <div className="fixed inset-0 z-50 flex flex-col bg-bg">
+      <div className="flex items-center gap-3 border-b border-surface-2 p-5">
+        <div className="flex flex-1 items-center gap-2 rounded-2xl bg-surface px-4 py-3">
+          <Search size={18} className="text-muted" />
           <input
             type="text"
             placeholder="Search exercises..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 bg-transparent text-sm text-[var(--color-text)] outline-none placeholder:text-[var(--color-text-muted)]"
+            className="flex-1 bg-transparent text-sm text-text outline-none placeholder:text-muted"
             autoFocus
           />
         </div>
-        <button onClick={onClose} className="p-2 text-[var(--color-text-muted)]">
+        <button onClick={onClose} className="rounded-xl bg-surface p-2.5 text-muted">
           <X size={22} />
         </button>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto p-3 pb-1">
+      <div className="flex gap-2 overflow-x-auto p-4 pb-2 scrollbar-none">
         <button
           onClick={() => setFilter('all')}
-          className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+          className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
             filter === 'all'
-              ? 'bg-[var(--color-primary)] text-white'
-              : 'bg-[var(--color-surface)] text-[var(--color-text-muted)]'
+              ? 'bg-primary text-white shadow-md shadow-primary/30'
+              : 'bg-surface text-muted'
           }`}
         >
           All
@@ -56,10 +56,10 @@ export default function ExercisePicker({ onSelect, onClose }: Props) {
           <button
             key={g}
             onClick={() => setFilter(g)}
-            className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+            className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
               filter === g
-                ? 'bg-[var(--color-primary)] text-white'
-                : 'bg-[var(--color-surface)] text-[var(--color-text-muted)]'
+                ? 'bg-primary text-white shadow-md shadow-primary/30'
+                : 'bg-surface text-muted'
             }`}
           >
             {muscleGroupLabels[g]}
@@ -67,19 +67,19 @@ export default function ExercisePicker({ onSelect, onClose }: Props) {
         ))}
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3">
+      <div className="flex-1 overflow-y-auto p-4">
         {filtered.length === 0 ? (
-          <p className="py-8 text-center text-[var(--color-text-muted)]">No exercises found</p>
+          <p className="py-12 text-center text-muted">No exercises found</p>
         ) : (
           <div className="space-y-2">
             {filtered.map((ex) => (
               <button
                 key={ex.id}
                 onClick={() => onSelect(ex)}
-                className="w-full rounded-lg bg-[var(--color-surface)] p-3 text-left transition-colors hover:bg-[var(--color-surface-2)]"
+                className="w-full rounded-2xl bg-surface p-4 text-left transition-colors hover:bg-surface-2 active:scale-[0.99]"
               >
-                <div className="font-medium">{ex.name}</div>
-                <div className="mt-0.5 text-xs text-[var(--color-text-muted)]">
+                <div className="font-semibold">{ex.name}</div>
+                <div className="mt-0.5 text-xs text-muted">
                   {muscleGroupLabels[ex.muscleGroup]} &middot; {ex.equipment}
                 </div>
               </button>
