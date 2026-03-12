@@ -14,8 +14,8 @@ export default defineConfig({
         name: 'GymTracker',
         short_name: 'GymTracker',
         description: 'Track your workouts, browse exercises, and monitor progress',
-        theme_color: '#6366f1',
-        background_color: '#0f172a',
+        theme_color: '#ffffff',
+        background_color: '#f5f5f7',
         display: 'standalone',
         start_url: '/',
         icons: [

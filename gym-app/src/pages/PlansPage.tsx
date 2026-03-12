@@ -62,7 +62,7 @@ export default function PlansPage() {
 
       <div className="space-y-3">
         {allPlans.map((plan) => (
-          <div key={plan.id} className="overflow-hidden rounded-2xl bg-surface shadow-lg shadow-black/10">
+          <div key={plan.id} className="overflow-hidden rounded-2xl bg-surface shadow-sm">
             <button
               onClick={() => setExpanded(expanded === plan.id ? null : plan.id)}
               className="flex w-full items-center justify-between p-4"
@@ -84,7 +84,7 @@ export default function PlansPage() {
             </button>
 
             {expanded === plan.id && (
-              <div className="border-t border-surface-2 p-4 pt-2">
+              <div className="border-t border-border p-4 pt-2">
                 {plan.days.map((day) => (
                   <div key={day.id} className="mb-2">
                     <button
@@ -199,7 +199,7 @@ function CreatePlanModal({
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-bg">
-      <div className="flex items-center justify-between border-b border-surface-2 p-5">
+      <div className="flex items-center justify-between border-b border-border p-5">
         <h2 className="text-lg font-extrabold">Create Plan</h2>
         <div className="flex gap-2">
           <button onClick={onClose} className="rounded-xl bg-surface px-4 py-2 text-sm font-medium text-muted">
@@ -232,7 +232,7 @@ function CreatePlanModal({
         </div>
 
         {days.map((day, dayIdx) => (
-          <div key={day.id} className="rounded-2xl bg-surface p-4 shadow-lg shadow-black/10">
+          <div key={day.id} className="rounded-2xl bg-surface p-4 shadow-sm">
             <input
               value={day.name}
               onChange={(e) => {
@@ -261,7 +261,7 @@ function CreatePlanModal({
 
         <button
           onClick={addDay}
-          className="w-full rounded-2xl border-2 border-dashed border-surface-2 py-4 text-sm font-semibold text-primary-light transition-colors hover:border-primary"
+          className="w-full rounded-2xl border-2 border-dashed border-border py-4 text-sm font-semibold text-primary transition-colors hover:border-primary"
         >
           + Add Day
         </button>
@@ -294,7 +294,7 @@ function ExercisePickerSimple({
 
   return (
     <div className="flex h-full flex-col bg-bg">
-      <div className="flex items-center gap-2 border-b border-surface-2 p-4">
+      <div className="flex items-center gap-2 border-b border-border p-4">
         <input
           type="text"
           placeholder="Search..."

@@ -24,7 +24,7 @@ export default function ExercisePicker({ onSelect, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-bg">
-      <div className="flex items-center gap-3 border-b border-surface-2 p-5">
+      <div className="flex items-center gap-3 border-b border-border p-5">
         <div className="flex flex-1 items-center gap-2 rounded-2xl bg-surface px-4 py-3">
           <Search size={18} className="text-muted" />
           <input

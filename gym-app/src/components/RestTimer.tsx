@@ -41,8 +41,8 @@ export default function RestTimer({ onClose }: Props) {
   const progress = seconds > 0 ? (remaining / seconds) * 100 : 0
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-5 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-3xl bg-surface p-6 shadow-2xl shadow-black/30">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-5 backdrop-blur-sm">
+      <div className="w-full max-w-sm rounded-3xl bg-surface p-6 shadow-2xl">
         <div className="mb-5 flex items-center justify-between">
           <h3 className="text-lg font-extrabold">Rest Timer</h3>
           <button onClick={onClose} className="rounded-xl bg-surface-2 p-2 text-muted">
@@ -52,7 +52,7 @@ export default function RestTimer({ onClose }: Props) {
 
         <div className="relative mx-auto mb-6 flex h-44 w-44 items-center justify-center">
           <svg className="absolute inset-0 -rotate-90" viewBox="0 0 176 176">
-            <circle cx="88" cy="88" r="80" fill="none" stroke="var(--color-surface-2)" strokeWidth="8" />
+            <circle cx="88" cy="88" r="80" fill="none" stroke="var(--color-border)" strokeWidth="8" />
             <circle
               cx="88"
               cy="88"

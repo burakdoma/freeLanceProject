@@ -10,7 +10,7 @@ const navItems = [
 
 export default function BottomNav() {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-surface-2 bg-surface/95 backdrop-blur-md">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-surface/95 backdrop-blur-md">
       <div className="mx-auto flex max-w-lg">
         {navItems.map(({ to, icon: Icon, label }) => (
           <NavLink
@@ -20,7 +20,7 @@ export default function BottomNav() {
             className={({ isActive }) =>
               `relative flex flex-1 flex-col items-center gap-1 pb-2 pt-3 text-[11px] font-medium transition-colors ${
                 isActive
-                  ? 'text-primary-light'
+                  ? 'text-primary'
                   : 'text-muted'
               }`
             }
@@ -28,7 +28,7 @@ export default function BottomNav() {
             {({ isActive }) => (
               <>
                 {isActive && (
-                  <span className="absolute top-0 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-primary-light" />
+                  <span className="absolute top-0 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-primary" />
                 )}
                 <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
                 <span>{label}</span>

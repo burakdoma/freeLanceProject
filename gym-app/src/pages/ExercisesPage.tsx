@@ -31,7 +31,7 @@ export default function ExercisesPage() {
       <h1 className="mb-1 text-2xl font-extrabold tracking-tight">Exercise Library</h1>
       <p className="mb-5 text-sm text-muted">{exercises.length} exercises across {groups.length} muscle groups</p>
 
-      <div className="mb-4 flex items-center gap-2 rounded-2xl bg-surface px-4 py-3 shadow-lg shadow-black/10">
+      <div className="mb-4 flex items-center gap-2 rounded-2xl bg-surface px-4 py-3 shadow-sm">
         <Search size={18} className="text-muted" />
         <input
           type="text"
@@ -71,12 +71,12 @@ export default function ExercisesPage() {
       <div className="space-y-6">
         {grouped.map(({ group, exercises: exs }) => (
           <div key={group}>
-            <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-primary-light">
+            <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-primary">
               {muscleGroupLabels[group]}
             </h2>
             <div className="space-y-2">
               {exs.map((ex) => (
-                <div key={ex.id} className="overflow-hidden rounded-2xl bg-surface shadow-lg shadow-black/10">
+                <div key={ex.id} className="overflow-hidden rounded-2xl bg-surface shadow-sm">
                   <button
                     onClick={() => setExpanded(expanded === ex.id ? null : ex.id)}
                     className="flex w-full items-center justify-between p-4"
@@ -92,7 +92,7 @@ export default function ExercisesPage() {
                     )}
                   </button>
                   {expanded === ex.id && (
-                    <div className="border-t border-surface-2 px-4 pb-4 pt-3">
+                    <div className="border-t border-border px-4 pb-4 pt-3">
                       <p className="mb-3 text-sm leading-relaxed text-muted">{ex.description}</p>
                       {ex.secondaryMuscles.length > 0 && (
                         <div className="flex flex-wrap items-center gap-1.5">
@@ -100,7 +100,7 @@ export default function ExercisesPage() {
                           {ex.secondaryMuscles.map((m) => (
                             <span
                               key={m}
-                              className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary-light"
+                              className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary"
                             >
                               {muscleGroupLabels[m]}
                             </span>

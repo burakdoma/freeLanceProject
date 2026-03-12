@@ -100,10 +100,10 @@ export default function ProgressPage() {
 
       {/* Stats cards */}
       <div className="mb-6 grid grid-cols-2 gap-3">
-        <StatCard icon={<Dumbbell size={20} />} label="Total Workouts" value={stats.totalWorkouts.toString()} color="var(--color-primary-light)" />
+        <StatCard icon={<Dumbbell size={20} />} label="Total Workouts" value={stats.totalWorkouts.toString()} color="var(--color-primary)" />
         <StatCard icon={<Flame size={20} />} label="Day Streak" value={stats.streak.toString()} color="var(--color-warning)" />
         <StatCard icon={<TrendingUp size={20} />} label="Total Volume" value={`${(stats.totalVolume / 1000).toFixed(1)}t`} color="var(--color-success)" />
-        <StatCard icon={<Clock size={20} />} label="Total Time" value={`${Math.round(stats.totalDuration / 60)}h`} color="var(--color-accent)" />
+        <StatCard icon={<Clock size={20} />} label="Total Time" value={`${Math.round(stats.totalDuration / 60)}h`} color="var(--color-primary)" />
       </div>
 
       {workouts.length === 0 ? (
@@ -116,7 +116,7 @@ export default function ProgressPage() {
       ) : (
         <>
           {/* Weekly Volume Chart */}
-          <div className="mb-4 rounded-2xl bg-surface p-5 shadow-lg shadow-black/10">
+          <div className="mb-4 rounded-2xl bg-surface p-5 shadow-sm">
             <h2 className="mb-4 text-xs font-bold uppercase tracking-widest text-muted">Weekly Volume (kg)</h2>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={weeklyVolume}>
@@ -129,7 +129,7 @@ export default function ProgressPage() {
           </div>
 
           {/* Weekly Frequency */}
-          <div className="mb-4 rounded-2xl bg-surface p-5 shadow-lg shadow-black/10">
+          <div className="mb-4 rounded-2xl bg-surface p-5 shadow-sm">
             <h2 className="mb-4 text-xs font-bold uppercase tracking-widest text-muted">Workouts Per Week</h2>
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={weeklyCount}>
@@ -143,7 +143,7 @@ export default function ProgressPage() {
 
           {/* Top exercises */}
           {topExercises.length > 0 && (
-            <div className="rounded-2xl bg-surface p-5 shadow-lg shadow-black/10">
+            <div className="rounded-2xl bg-surface p-5 shadow-sm">
               <h2 className="mb-4 text-xs font-bold uppercase tracking-widest text-muted">Top Exercises by Volume</h2>
               <div className="space-y-3">
                 {topExercises.map((e, i) => {
@@ -174,7 +174,7 @@ export default function ProgressPage() {
 
 function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string; color: string }) {
   return (
-    <div className="rounded-2xl bg-surface p-4 shadow-lg shadow-black/10">
+    <div className="rounded-2xl bg-surface p-4 shadow-sm">
       <div className="mb-2" style={{ color }}>{icon}</div>
       <div className="text-2xl font-extrabold">{value}</div>
       <div className="mt-0.5 text-xs font-medium text-muted">{label}</div>
