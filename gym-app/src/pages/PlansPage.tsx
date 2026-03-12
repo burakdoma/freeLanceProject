@@ -2,11 +2,10 @@ import { useState, useEffect } from 'react'
 import { ChevronDown, ChevronUp, Play, Plus, Trash2 } from 'lucide-react'
 import { defaultPlans } from '../data/plans'
 import { getCustomPlans, saveCustomPlan, deleteCustomPlan } from '../lib/storage'
-import type { WorkoutPlan, PlanDay, PlanExercise } from '../types'
+import type { WorkoutPlan, PlanDay } from '../types'
 import { exercises, muscleGroupLabels } from '../data/exercises'
 import { v4 } from '../lib/uuid'
 import { useNavigate } from 'react-router-dom'
-import { saveWorkout } from '../lib/storage'
 import type { Workout, WorkoutExercise } from '../types'
 
 export default function PlansPage() {
