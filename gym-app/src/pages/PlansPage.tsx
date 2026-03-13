@@ -41,7 +41,7 @@ export default function PlansPage() {
       notes: '',
     }
     sessionStorage.setItem('activeWorkout', JSON.stringify(workout))
-    navigate('/')
+    navigate('/workout')
   }
 
   return (
