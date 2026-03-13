@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Plus, Trash2, Timer, Check, ChevronDown, ChevronUp, Dumbbell } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Plus, Trash2, Check, ChevronDown, ChevronUp, Dumbbell, MoreVertical, ArrowLeft, StickyNote } from 'lucide-react'
 import { v4 } from '../lib/uuid'
 import ExercisePicker from '../components/ExercisePicker'
 import RestTimer from '../components/RestTimer'
@@ -13,11 +13,13 @@ export default function WorkoutPage() {
   const [showPicker, setShowPicker] = useState(false)
   const [showTimer, setShowTimer] = useState(false)
   const [startTime, setStartTime] = useState<number>(0)
+  const [elapsed, setElapsed] = useState('00:00')
   const [expandedWorkout, setExpandedWorkout] = useState<string | null>(null)
+  const [expandedNotes, setExpandedNotes] = useState<string | null>(null)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
     setWorkouts(getWorkouts())
-    // Check if a workout was started from Plans page
     const saved = sessionStorage.getItem('activeWorkout')
     if (saved) {
       setActiveWorkout(JSON.parse(saved))
@@ -25,6 +27,19 @@ export default function WorkoutPage() {
       sessionStorage.removeItem('activeWorkout')
     }
   }, [])
+
+  // Live timer
+  useEffect(() => {
+    if (activeWorkout && startTime) {
+      intervalRef.current = setInterval(() => {
+        const diff = Math.floor((Date.now() - startTime) / 1000)
+        const m = Math.floor(diff / 60).toString().padStart(2, '0')
+        const s = (diff % 60).toString().padStart(2, '0')
+        setElapsed(`${m}:${s}`)
+      }, 1000)
+      return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
+    }
+  }, [activeWorkout, startTime])
 
   function startNewWorkout() {
     const workout: Workout = {
@@ -84,6 +99,13 @@ export default function WorkoutPage() {
     setActiveWorkout({ ...activeWorkout, exercises })
   }
 
+  function removeExercise(exerciseIdx: number) {
+    if (!activeWorkout) return
+    const exercises = [...activeWorkout.exercises]
+    exercises.splice(exerciseIdx, 1)
+    setActiveWorkout({ ...activeWorkout, exercises })
+  }
+
   function finishWorkout() {
     if (!activeWorkout) return
     const duration = Math.round((Date.now() - startTime) / 60000)
@@ -98,6 +120,12 @@ export default function WorkoutPage() {
     saveWorkout(finished)
     setWorkouts(getWorkouts())
     setActiveWorkout(null)
+    if (intervalRef.current) clearInterval(intervalRef.current)
+  }
+
+  function cancelWorkout() {
+    setActiveWorkout(null)
+    if (intervalRef.current) clearInterval(intervalRef.current)
   }
 
   function handleDeleteWorkout(id: string) {
@@ -105,104 +133,155 @@ export default function WorkoutPage() {
     setWorkouts(getWorkouts())
   }
 
+  // Active workout view - matches "Workout Logger" screen
   if (activeWorkout) {
     return (
       <div className="pb-24">
-        <div className="sticky top-0 z-10 border-b border-border bg-surface px-5 py-4">
-          <div className="flex items-center justify-between">
-            <input
-              value={activeWorkout.name}
-              onChange={(e) => setActiveWorkout({ ...activeWorkout, name: e.target.value })}
-              className="bg-transparent text-lg font-bold text-text outline-none"
-            />
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowTimer(true)}
-                className="rounded-xl bg-surface-2 p-2.5 text-primary"
-              >
-                <Timer size={20} />
-              </button>
-              <button
-                onClick={finishWorkout}
-                className="flex items-center gap-1.5 rounded-xl bg-success px-4 py-2.5 text-sm font-bold text-white active:scale-[0.97] transition-transform"
-              >
-                <Check size={16} /> Finish
-              </button>
+        {/* Header */}
+        <div className="sticky top-0 z-10 bg-surface/95 backdrop-blur-md">
+          <div className="flex items-center justify-between px-5 py-4">
+            <button onClick={cancelWorkout} className="text-muted">
+              <ArrowLeft size={22} />
+            </button>
+            <div className="text-center">
+              <input
+                value={activeWorkout.name}
+                onChange={(e) => setActiveWorkout({ ...activeWorkout, name: e.target.value })}
+                className="bg-transparent text-center font-bold text-text outline-none"
+              />
+              <div className="text-xs text-primary">Duration: {elapsed}</div>
             </div>
+            <button className="text-muted">
+              <MoreVertical size={20} />
+            </button>
           </div>
         </div>
 
-        <div className="space-y-4 p-5">
+        <div className="space-y-5 px-5 pt-2">
           {activeWorkout.exercises.map((ex, exIdx) => (
-            <div key={ex.id} className="overflow-hidden rounded-2xl bg-surface shadow-sm">
-              <div className="border-b border-border px-4 py-3">
-                <h3 className="font-bold text-text">{ex.exerciseName}</h3>
+            <div key={ex.id}>
+              {/* Exercise header */}
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="text-lg font-bold text-text">{ex.exerciseName}</h3>
+                <button
+                  onClick={() => removeExercise(exIdx)}
+                  className="rounded-lg bg-danger/10 px-2.5 py-1 text-xs font-medium text-danger"
+                >
+                  Remove
+                </button>
               </div>
-              <div className="p-4">
-                <div className="mb-2 grid grid-cols-[2rem_1fr_1fr_2rem_2rem] items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-muted">
-                  <span>Set</span>
-                  <span>kg</span>
-                  <span>Reps</span>
-                  <span></span>
+
+              {/* Sets table */}
+              <div className="overflow-hidden rounded-2xl border border-border bg-surface">
+                {/* Table header */}
+                <div className="grid grid-cols-[3rem_1fr_1fr_2.5rem] items-center gap-1 border-b border-border px-3 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted">
+                  <span className="text-center">Set</span>
+                  <span className="text-center">KG</span>
+                  <span className="text-center">Reps</span>
                   <span></span>
                 </div>
+
+                {/* Set rows */}
                 {ex.sets.map((set, setIdx) => (
                   <div
                     key={set.id}
-                    className={`mb-2 grid grid-cols-[2rem_1fr_1fr_2rem_2rem] items-center gap-2 ${
-                      set.completed ? 'opacity-50' : ''
+                    className={`grid grid-cols-[3rem_1fr_1fr_2.5rem] items-center gap-1 border-b border-border/50 px-3 py-1.5 transition-colors ${
+                      set.completed ? 'bg-primary/5' : ''
                     }`}
                   >
-                    <span className="text-center text-sm font-semibold text-muted">{setIdx + 1}</span>
+                    {/* Set number circle */}
+                    <div className="flex justify-center">
+                      <span className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold ${
+                        set.completed
+                          ? 'bg-primary text-black'
+                          : 'border-2 border-primary/40 text-primary'
+                      }`}>
+                        {setIdx + 1}
+                      </span>
+                    </div>
+
+                    {/* Weight input */}
                     <input
                       type="number"
                       inputMode="decimal"
                       value={set.weight || ''}
                       onChange={(e) => updateSet(exIdx, setIdx, 'weight', parseFloat(e.target.value) || 0)}
-                      className="rounded-lg border border-border bg-surface-2 px-2 py-2 text-center text-sm font-medium text-text outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-                      placeholder="0"
+                      className="mx-1 rounded-lg bg-surface-2 px-2 py-2.5 text-center text-sm font-semibold text-text outline-none focus:ring-1 focus:ring-primary"
+                      placeholder="---"
                     />
+
+                    {/* Reps input */}
                     <input
                       type="number"
                       inputMode="numeric"
                       value={set.reps || ''}
                       onChange={(e) => updateSet(exIdx, setIdx, 'reps', parseInt(e.target.value) || 0)}
-                      className="rounded-lg border border-border bg-surface-2 px-2 py-2 text-center text-sm font-medium text-text outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-                      placeholder="0"
+                      className="mx-1 rounded-lg bg-surface-2 px-2 py-2.5 text-center text-sm font-semibold text-text outline-none focus:ring-1 focus:ring-primary"
+                      placeholder="---"
                     />
+
+                    {/* Complete / Delete */}
                     <button
-                      onClick={() => updateSet(exIdx, setIdx, 'completed', !set.completed)}
-                      className={`flex h-9 w-9 items-center justify-center rounded-full transition-colors ${
+                      onClick={() => {
+                        if (set.completed) {
+                          removeSet(exIdx, setIdx)
+                        } else {
+                          updateSet(exIdx, setIdx, 'completed', true)
+                        }
+                      }}
+                      className={`flex h-8 w-8 items-center justify-center rounded-full transition-all ${
                         set.completed
-                          ? 'bg-success text-white'
-                          : 'border-2 border-border bg-surface text-muted'
+                          ? 'bg-primary text-black'
+                          : 'text-muted hover:text-primary'
                       }`}
                     >
-                      <Check size={16} />
-                    </button>
-                    <button
-                      onClick={() => removeSet(exIdx, setIdx)}
-                      className="flex h-9 w-9 items-center justify-center rounded-full text-danger/60 hover:text-danger"
-                    >
-                      <Trash2 size={14} />
+                      {set.completed ? <Check size={16} strokeWidth={3} /> : <Check size={16} />}
                     </button>
                   </div>
                 ))}
+
+                {/* Add Set row */}
                 <button
                   onClick={() => addSet(exIdx)}
-                  className="mt-2 w-full rounded-xl border border-dashed border-border py-2.5 text-xs font-semibold text-primary"
+                  className="flex w-full items-center justify-center gap-1.5 py-3 text-xs font-semibold text-primary transition-colors hover:bg-surface-2"
                 >
-                  + Add Set
+                  <Plus size={14} /> Add Set
                 </button>
               </div>
+
+              {/* Exercise Notes toggle */}
+              <button
+                onClick={() => setExpandedNotes(expandedNotes === ex.id ? null : ex.id)}
+                className="mt-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted"
+              >
+                <StickyNote size={12} /> Exercise Notes
+              </button>
+              {expandedNotes === ex.id && (
+                <textarea
+                  placeholder="Focus on explosive upward phase..."
+                  className="mt-2 w-full resize-none rounded-xl bg-surface-2 px-4 py-3 text-sm text-text outline-none placeholder:text-muted/50 focus:ring-1 focus:ring-primary"
+                  rows={2}
+                />
+              )}
             </div>
           ))}
 
+          {/* Add Exercise button */}
           <button
             onClick={() => setShowPicker(true)}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-accent py-4 text-sm font-bold text-white shadow-sm active:scale-[0.98] transition-transform"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/30 py-5 text-sm font-bold text-primary transition-all hover:border-primary hover:bg-primary/5"
           >
             <Plus size={18} /> Add Exercise
+          </button>
+        </div>
+
+        {/* Floating Finish Button */}
+        <div className="fixed bottom-20 left-0 right-0 z-20 flex justify-center px-5">
+          <button
+            onClick={finishWorkout}
+            className="flex items-center gap-2 rounded-full bg-primary px-8 py-3.5 text-sm font-extrabold uppercase tracking-wider text-black shadow-lg shadow-primary/30 active:scale-[0.97] transition-transform"
+          >
+            Finish <Check size={18} strokeWidth={3} />
           </button>
         </div>
 
@@ -212,67 +291,80 @@ export default function WorkoutPage() {
     )
   }
 
+  // Workout list / home view
   return (
     <div className="p-5 pb-24">
-      <h1 className="mb-1 text-2xl font-extrabold tracking-tight text-text">Workout</h1>
+      <h1 className="mb-1 text-2xl font-extrabold tracking-tight">Workouts</h1>
       <p className="mb-6 text-sm text-muted">Track your lifts and crush your goals</p>
+
       <button
         onClick={startNewWorkout}
-        className="mb-8 flex w-full items-center justify-center gap-2 rounded-2xl bg-accent py-4 text-base font-bold text-white shadow-md shadow-accent/20 active:scale-[0.98] transition-transform"
+        className="mb-8 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-base font-extrabold uppercase tracking-wider text-black shadow-lg shadow-primary/25 active:scale-[0.98] transition-transform"
       >
-        <Plus size={20} /> Start New Workout
+        <Plus size={20} strokeWidth={3} /> Start Workout
       </button>
 
       {workouts.length === 0 ? (
         <div className="py-16 text-center">
           <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-surface-2">
-            <Dumbbell size={36} className="text-muted" />
+            <Dumbbell size={36} className="text-primary/40" />
           </div>
-          <p className="font-medium text-muted">No workouts yet</p>
-          <p className="mt-1 text-sm text-muted">Start your first one!</p>
+          <p className="font-semibold text-muted">No workouts yet</p>
+          <p className="mt-1 text-sm text-muted/70">Start your first session!</p>
         </div>
       ) : (
         <div className="space-y-3">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-muted">History</h2>
-          {workouts.map((w) => (
-            <div key={w.id} className="rounded-2xl bg-surface p-4 shadow-sm">
-              <button
-                onClick={() => setExpandedWorkout(expandedWorkout === w.id ? null : w.id)}
-                className="flex w-full items-center justify-between"
-              >
-                <div className="text-left">
-                  <div className="font-bold text-text">{w.name}</div>
-                  <div className="mt-0.5 text-xs text-muted">
-                    {format(new Date(w.date), 'MMM d, yyyy')} &middot; {w.duration} min &middot;{' '}
-                    {w.exercises.length} exercises
-                  </div>
-                </div>
-                <div className="text-muted">
-                  {expandedWorkout === w.id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-                </div>
-              </button>
-              {expandedWorkout === w.id && (
-                <div className="mt-3 space-y-2 border-t border-border pt-3">
-                  {w.exercises.map((ex) => (
-                    <div key={ex.id}>
-                      <div className="text-sm font-semibold text-primary">{ex.exerciseName}</div>
-                      {ex.sets.map((s, i) => (
-                        <div key={s.id} className="ml-2 text-xs text-muted">
-                          Set {i + 1}: {s.weight}kg x {s.reps} reps
-                        </div>
-                      ))}
+          <h2 className="text-[11px] font-bold uppercase tracking-widest text-muted">Recent Workouts</h2>
+          {workouts.map((w) => {
+            const totalVolume = w.exercises.reduce((sum, e) =>
+              sum + e.sets.reduce((s, set) => s + set.weight * set.reps, 0), 0)
+            const totalSets = w.exercises.reduce((sum, e) => sum + e.sets.length, 0)
+
+            return (
+              <div key={w.id} className="overflow-hidden rounded-2xl border border-border bg-surface">
+                <button
+                  onClick={() => setExpandedWorkout(expandedWorkout === w.id ? null : w.id)}
+                  className="flex w-full items-center justify-between p-4"
+                >
+                  <div className="text-left">
+                    <div className="font-bold">{w.name}</div>
+                    <div className="mt-1 text-xs text-muted">
+                      {format(new Date(w.date), 'MMM d, yyyy')}
                     </div>
-                  ))}
-                  <button
-                    onClick={() => handleDeleteWorkout(w.id)}
-                    className="mt-2 flex items-center gap-1 text-xs text-danger"
-                  >
-                    <Trash2 size={12} /> Delete
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <div className="text-xs font-semibold text-primary">{w.duration} min</div>
+                      <div className="text-[11px] text-muted">{totalSets} sets &middot; {(totalVolume / 1000).toFixed(1)}t</div>
+                    </div>
+                    <div className="text-muted">
+                      {expandedWorkout === w.id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                    </div>
+                  </div>
+                </button>
+                {expandedWorkout === w.id && (
+                  <div className="border-t border-border px-4 pb-4 pt-3 space-y-2">
+                    {w.exercises.map((ex) => (
+                      <div key={ex.id}>
+                        <div className="text-sm font-semibold text-primary">{ex.exerciseName}</div>
+                        {ex.sets.map((s, i) => (
+                          <div key={s.id} className="ml-2 text-xs text-muted">
+                            Set {i + 1}: {s.weight}kg x {s.reps}
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => handleDeleteWorkout(w.id)}
+                      className="mt-2 flex items-center gap-1 text-xs text-danger"
+                    >
+                      <Trash2 size={12} /> Delete
+                    </button>
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
       )}
     </div>

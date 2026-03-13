@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 import { Dumbbell, Library, ClipboardList, BarChart3 } from 'lucide-react'
 
 const navItems = [
-  { to: '/', icon: Dumbbell, label: 'Workout' },
+  { to: '/', icon: Dumbbell, label: 'Workouts' },
   { to: '/exercises', icon: Library, label: 'Exercises' },
   { to: '/plans', icon: ClipboardList, label: 'Plans' },
   { to: '/progress', icon: BarChart3, label: 'Progress' },
@@ -30,7 +30,7 @@ export default function BottomNav() {
                 {isActive && (
                   <span className="absolute top-0 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-primary" />
                 )}
-                <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
+                <Icon size={22} strokeWidth={isActive ? 2.5 : 1.5} />
                 <span>{label}</span>
               </>
             )}

@@ -25,18 +25,18 @@ export default function ExercisePicker({ onSelect, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-bg">
       <div className="flex items-center gap-3 border-b border-border p-5">
-        <div className="flex flex-1 items-center gap-2 rounded-2xl bg-surface px-4 py-3">
+        <div className="flex flex-1 items-center gap-2 rounded-2xl border border-border bg-surface px-4 py-3">
           <Search size={18} className="text-muted" />
           <input
             type="text"
             placeholder="Search exercises..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 bg-transparent text-sm text-text outline-none placeholder:text-muted"
+            className="flex-1 bg-transparent text-sm text-text outline-none placeholder:text-muted/50"
             autoFocus
           />
         </div>
-        <button onClick={onClose} className="rounded-xl bg-surface p-2.5 text-muted">
+        <button onClick={onClose} className="rounded-xl border border-border bg-surface p-2.5 text-muted">
           <X size={22} />
         </button>
       </div>
@@ -46,8 +46,8 @@ export default function ExercisePicker({ onSelect, onClose }: Props) {
           onClick={() => setFilter('all')}
           className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
             filter === 'all'
-              ? 'bg-primary text-white shadow-md shadow-primary/30'
-              : 'bg-surface text-muted'
+              ? 'bg-primary text-black'
+              : 'border border-border bg-surface text-muted'
           }`}
         >
           All
@@ -58,8 +58,8 @@ export default function ExercisePicker({ onSelect, onClose }: Props) {
             onClick={() => setFilter(g)}
             className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
               filter === g
-                ? 'bg-primary text-white shadow-md shadow-primary/30'
-                : 'bg-surface text-muted'
+                ? 'bg-primary text-black'
+                : 'border border-border bg-surface text-muted'
             }`}
           >
             {muscleGroupLabels[g]}
@@ -76,7 +76,7 @@ export default function ExercisePicker({ onSelect, onClose }: Props) {
               <button
                 key={ex.id}
                 onClick={() => onSelect(ex)}
-                className="w-full rounded-2xl bg-surface p-4 text-left transition-colors hover:bg-surface-2 active:scale-[0.99]"
+                className="w-full rounded-2xl border border-border bg-surface p-4 text-left transition-colors hover:border-primary active:scale-[0.99]"
               >
                 <div className="font-semibold">{ex.name}</div>
                 <div className="mt-0.5 text-xs text-muted">

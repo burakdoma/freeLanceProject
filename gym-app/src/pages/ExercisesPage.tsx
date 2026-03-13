@@ -31,24 +31,26 @@ export default function ExercisesPage() {
       <h1 className="mb-1 text-2xl font-extrabold tracking-tight">Exercise Library</h1>
       <p className="mb-5 text-sm text-muted">{exercises.length} exercises across {groups.length} muscle groups</p>
 
-      <div className="mb-4 flex items-center gap-2 rounded-2xl bg-surface px-4 py-3 shadow-sm">
+      {/* Search */}
+      <div className="mb-4 flex items-center gap-2 rounded-2xl border border-border bg-surface px-4 py-3">
         <Search size={18} className="text-muted" />
         <input
           type="text"
           placeholder="Search exercises..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 bg-transparent text-sm text-text outline-none placeholder:text-muted"
+          className="flex-1 bg-transparent text-sm text-text outline-none placeholder:text-muted/50"
         />
       </div>
 
+      {/* Filter pills */}
       <div className="mb-5 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
         <button
           onClick={() => setFilter('all')}
           className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
             filter === 'all'
-              ? 'bg-primary text-white shadow-md shadow-primary/30'
-              : 'bg-surface text-muted'
+              ? 'bg-primary text-black'
+              : 'border border-border bg-surface text-muted'
           }`}
         >
           All
@@ -59,8 +61,8 @@ export default function ExercisesPage() {
             onClick={() => setFilter(g)}
             className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition-all ${
               filter === g
-                ? 'bg-primary text-white shadow-md shadow-primary/30'
-                : 'bg-surface text-muted'
+                ? 'bg-primary text-black'
+                : 'border border-border bg-surface text-muted'
             }`}
           >
             {muscleGroupLabels[g]}
@@ -68,15 +70,16 @@ export default function ExercisesPage() {
         ))}
       </div>
 
+      {/* Exercise list */}
       <div className="space-y-6">
         {grouped.map(({ group, exercises: exs }) => (
           <div key={group}>
-            <h2 className="mb-3 text-xs font-bold uppercase tracking-widest text-primary">
+            <h2 className="mb-3 text-[11px] font-bold uppercase tracking-widest text-primary">
               {muscleGroupLabels[group]}
             </h2>
             <div className="space-y-2">
               {exs.map((ex) => (
-                <div key={ex.id} className="overflow-hidden rounded-2xl bg-surface shadow-sm">
+                <div key={ex.id} className="overflow-hidden rounded-2xl border border-border bg-surface">
                   <button
                     onClick={() => setExpanded(expanded === ex.id ? null : ex.id)}
                     className="flex w-full items-center justify-between p-4"
