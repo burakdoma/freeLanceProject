@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --color-bg: #0a0a0f;
+  --color-surface: #141419;
+  --color-surface-2: #1e1e26;
+  --color-surface-3: #282833;
+  --color-border: #2a2a35;
+  --color-text: #f0f0f5;
+  --color-muted: #6b6b7b;
+  --color-primary: #b4f700;
+  --color-primary-light: #c8ff33;
+  --color-primary-dim: #b4f700/15;
+  --color-accent: #b4f700;
+  --color-success: #b4f700;
+  --color-warning: #ff9f0a;
+  --color-danger: #ff453a;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  border: none;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface-2);
+  border-radius: 2px;
+}
