@@ -41,10 +41,11 @@ def main():
                   f"Entry: ${t['entry_price']:.2f} Exit: ${t['exit_price']:.2f} | "
                   f"P&L: ${t['pnl']:.2f} [{direction}]")
 
-    # Save chart
-    print("\nSaving chart to trendline_breaks/qqq_test_chart.png...")
+    # Save candlestick chart
+    print("\nSaving candlestick chart to trendline_breaks/qqq_test_chart.png...")
     plot_trendlines(df, signals, "QQQ (Sample - 1H)",
-                    save_path="trendline_breaks/qqq_test_chart.png")
+                    save_path="trendline_breaks/qqq_test_chart.png",
+                    candlestick=True)
 
 
 if __name__ == "__main__":
