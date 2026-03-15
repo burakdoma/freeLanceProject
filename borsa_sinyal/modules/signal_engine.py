@@ -19,9 +19,9 @@ class SignalResult:
 
 # NASDAQ 100 (QQQ) varsayılan seviyeleri
 DEFAULT_LEVELS = {
-    "buy_level": 485.00,
-    "weakness_level": 480.15,   # 485'in %1 altı
-    "sell_level": 465.60,       # 485'in %4 altı
+    "buy_level": 593.00,
+    "weakness_level": 587.07,   # 593'ün %1 altı
+    "sell_level": 569.28,       # 593'ün %4 altı
 }
 
 # 1H mumlar için: 7 saat/gün x 45 gün = 315 mum
