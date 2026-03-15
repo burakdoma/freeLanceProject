@@ -140,8 +140,7 @@ var float trailLow  = na
 // === LONG ENTRY ===
 if longCondition and strategy.position_size == 0
     strategy.entry("Long", strategy.long)
-    rawSL = close - atrValue * atrSlMult
-    longSL := rawSL * 0.99  // %1 daha aşağı çek
+    longSL := close - atrValue * atrSlMult
     trailHigh := high
 
 // === SHORT ENTRY ===
