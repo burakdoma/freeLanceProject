@@ -1,7 +1,6 @@
 """Telegram Bot API entegrasyon modülü."""
 
 import logging
-from urllib.parse import quote
 
 import requests
 
@@ -21,17 +20,18 @@ def format_message(result: SignalResult) -> str:
     """Sinyal sonucunu Telegram mesaj formatına çevirir."""
     emoji = SIGNAL_EMOJI.get(result.signal, "⚪")
     return (
-        f"{emoji} {result.signal} Sinyali\n"
+        f"{emoji} {result.signal} Signal\n"
         f"━━━━━━━━━━━━━━━━━━\n"
-        f"Sembol: {result.symbol}\n"
-        f"Tarih: {result.date}\n"
-        f"Kapanış: {result.close:.2f}\n"
-        f"Hacim: {result.volume:,.0f}\n"
-        f"45G Ort. Hacim: {result.avg_volume_45:,.0f}\n"
-        f"Sinyal: {result.signal}\n"
-        f"Neden: {result.reason}\n"
+        f"Symbol: {result.symbol}\n"
+        f"Date: {result.date}\n"
+        f"Interval: {result.interval}\n"
+        f"Close: {result.close:.2f}\n"
+        f"Volume: {result.volume:,.0f}\n"
+        f"Avg Volume: {result.avg_volume:,.0f}\n"
+        f"Signal: {result.signal}\n"
+        f"Reason: {result.reason}\n"
         f"━━━━━━━━━━━━━━━━━━\n"
-        f"⚠️ Bu yatırım tavsiyesi değildir."
+        f"⚠️ Not investment advice."
     )
 
 
