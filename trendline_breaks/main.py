@@ -1,9 +1,10 @@
 """
 Trendlines with Breaks - Main Entry Point
-Based on LuxAlgo's Pine Script indicator.
+Based on LuxAlgo's Pine Script indicator with improved V2 strategy.
 
 Usage:
     python -m trendline_breaks.main backtest AAPL
+    python -m trendline_breaks.main backtest AAPL --classic
     python -m trendline_breaks.main scan
     python -m trendline_breaks.main chart AAPL
     python -m trendline_breaks.main live
@@ -15,9 +16,13 @@ import sys
 from trendline_breaks.config import (
     SWING_LOOKBACK, SLOPE_MULT, SLOPE_METHOD,
     DEFAULT_SYMBOL, DEFAULT_PERIOD, DEFAULT_INTERVAL,
-    INITIAL_CAPITAL, POSITION_SIZE_PCT, WATCHLIST
+    INITIAL_CAPITAL, POSITION_SIZE_PCT, WATCHLIST,
+    EMA_FAST, EMA_SLOW, ADX_PERIOD, ADX_THRESHOLD,
+    RSI_PERIOD, RSI_OVERBOUGHT, RSI_OVERSOLD,
+    ATR_SL_MULT, TRAIL_ATR_MULT, ALLOW_SHORT
 )
 from trendline_breaks.core.trendline_engine import compute_trendlines
+from trendline_breaks.core.strategy_v2 import backtest_improved, print_report
 from trendline_breaks.data.fetcher import fetch_ohlcv
 from trendline_breaks.backtest.backtester import run_backtest
 from trendline_breaks.core.chart import plot_trendlines
@@ -32,12 +37,27 @@ def cmd_backtest(args):
     print(f"Loaded {len(df)} bars.\n")
 
     signals = compute_trendlines(df, SWING_LOOKBACK, SLOPE_MULT, SLOPE_METHOD)
-    result = run_backtest(df, signals, INITIAL_CAPITAL, POSITION_SIZE_PCT)
 
-    print(result.summary())
+    if args.classic:
+        # Original strategy
+        result = run_backtest(df, signals, INITIAL_CAPITAL, POSITION_SIZE_PCT)
+        print(result.summary())
+    else:
+        # Improved V2 strategy
+        result = backtest_improved(
+            df, signals,
+            initial_capital=INITIAL_CAPITAL,
+            position_size_pct=POSITION_SIZE_PCT,
+            ema_fast=EMA_FAST, ema_slow=EMA_SLOW,
+            adx_period=ADX_PERIOD, adx_threshold=ADX_THRESHOLD,
+            rsi_period=RSI_PERIOD, rsi_ob=RSI_OVERBOUGHT, rsi_os=RSI_OVERSOLD,
+            atr_sl_mult=ATR_SL_MULT, trail_atr_mult=TRAIL_ATR_MULT,
+            allow_short=ALLOW_SHORT,
+        )
+        print_report(result, f"{symbol} - Improved V2 Strategy")
 
     if args.chart:
-        plot_trendlines(df, signals, symbol)
+        plot_trendlines(df, signals, symbol, candlestick=True)
 
 
 def cmd_chart(args):
@@ -49,7 +69,7 @@ def cmd_chart(args):
     signals = compute_trendlines(df, SWING_LOOKBACK, SLOPE_MULT, SLOPE_METHOD)
 
     save_path = args.save if args.save else None
-    plot_trendlines(df, signals, symbol, save_path=save_path)
+    plot_trendlines(df, signals, symbol, save_path=save_path, candlestick=True)
 
 
 def cmd_scan(args):
@@ -80,6 +100,7 @@ def main():
     bt.add_argument("--period", default=DEFAULT_PERIOD, help="Data period (1y, 2y, 5y)")
     bt.add_argument("--interval", default=DEFAULT_INTERVAL, help="Bar interval (1d, 1h)")
     bt.add_argument("--chart", action="store_true", help="Show chart after backtest")
+    bt.add_argument("--classic", action="store_true", help="Use original strategy (no filters)")
     bt.set_defaults(func=cmd_backtest)
 
     # Chart
