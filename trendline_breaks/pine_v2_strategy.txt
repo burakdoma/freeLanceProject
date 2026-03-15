@@ -1,0 +1,246 @@
+// Trendlines with Breaks V2 - Improved Strategy
+// Based on LuxAlgo's indicator + EMA/ADX/RSI filters + ATR SL/Trailing
+// Optimized for BTCUSDT 1H
+//@version=5
+strategy("Trendlines with Breaks V2",
+     overlay=true,
+     initial_capital=1000,
+     default_qty_type=strategy.percent_of_equity,
+     default_qty_value=25,
+     commission_type=strategy.commission.percent,
+     commission_value=0.1,
+     slippage=1)
+
+//------------------------------------------------------------------------------
+// Settings
+//-----------------------------------------------------------------------------{
+// Trendline Settings
+length       = input.int(14, 'Swing Detection Lookback', group='Trendline')
+mult         = input.float(1., 'Slope', minval=0, step=.1, group='Trendline')
+calcMethod   = input.string('Atr', 'Slope Calculation Method', options=['Atr','Stdev','Linreg'], group='Trendline')
+
+// Trend Filter
+emaFastLen   = input.int(20, 'EMA Fast', group='Trend Filter')
+emaSlowLen   = input.int(50, 'EMA Slow', group='Trend Filter')
+useTrendFilter = input.bool(true, 'Use EMA Trend Filter', group='Trend Filter')
+
+// ADX Filter (Sideways Detection)
+adxLen       = input.int(14, 'ADX Period', group='ADX Filter')
+adxThreshold = input.float(20.0, 'ADX Threshold', step=1.0, group='ADX Filter')
+useAdxFilter = input.bool(true, 'Use ADX Filter (Skip Sideways)', group='ADX Filter')
+
+// RSI Filter
+rsiLen       = input.int(14, 'RSI Period', group='RSI Filter')
+rsiOB        = input.float(70.0, 'RSI Overbought', group='RSI Filter')
+rsiOS        = input.float(30.0, 'RSI Oversold', group='RSI Filter')
+useRsiFilter = input.bool(true, 'Use RSI Filter', group='RSI Filter')
+
+// Risk Management
+atrSlMult    = input.float(1.5, 'ATR Stop Loss Multiplier', step=0.1, group='Risk')
+trailAtrMult = input.float(2.5, 'ATR Trailing Stop Multiplier', step=0.1, group='Risk')
+useStopLoss  = input.bool(true, 'Use ATR Stop Loss', group='Risk')
+useTrailing  = input.bool(true, 'Use Trailing Stop', group='Risk')
+
+// Direction
+allowLong    = input.bool(true, 'Allow Long', group='Direction')
+allowShort   = input.bool(true, 'Allow Short', group='Direction')
+
+// Style
+upCss        = input.color(color.teal, 'Up Trendline Color', group='Style')
+dnCss        = input.color(color.red, 'Down Trendline Color', group='Style')
+
+//-----------------------------------------------------------------------------}
+// Trendline Calculations (from LuxAlgo)
+//-----------------------------------------------------------------------------{
+var upper    = 0.
+var lower    = 0.
+var slope_ph = 0.
+var slope_pl = 0.
+
+n   = bar_index
+src = close
+
+ph = ta.pivothigh(length, length)
+pl = ta.pivotlow(length, length)
+
+// Slope Calculation
+slope = switch calcMethod
+    'Atr'    => ta.atr(length) / length * mult
+    'Stdev'  => ta.stdev(src, length) / length * mult
+    'Linreg' => math.abs(ta.sma(src * n, length) - ta.sma(src, length) * ta.sma(n, length)) / ta.variance(n, length) / 2 * mult
+
+// Update slopes and trendlines
+slope_ph := ph ? slope : slope_ph
+slope_pl := pl ? slope : slope_pl
+
+upper := ph ? ph : upper - slope_ph
+lower := pl ? pl : lower + slope_pl
+
+// Breakout detection
+var upos = 0
+var dnos = 0
+
+upos := ph ? 0 : close > upper - slope_ph * length ? 1 : upos
+dnos := pl ? 0 : close < lower + slope_pl * length ? 1 : dnos
+
+upperBreak = upos > upos[1]
+lowerBreak = dnos > dnos[1]
+
+//-----------------------------------------------------------------------------}
+// V2 Filter Indicators
+//-----------------------------------------------------------------------------{
+// EMA Trend
+emaFast = ta.ema(close, emaFastLen)
+emaSlow = ta.ema(close, emaSlowLen)
+inUptrend   = emaFast > emaSlow
+inDowntrend = emaFast < emaSlow
+
+// ADX
+[diPlus, diMinus, adxValue] = ta.dmi(adxLen, adxLen)
+isTrending = adxValue > adxThreshold
+
+// RSI
+rsiValue = ta.rsi(close, rsiLen)
+rsiLongOk  = rsiValue < rsiOB
+rsiShortOk = rsiValue > rsiOS
+
+// ATR for stops
+atrValue = ta.atr(14)
+
+//-----------------------------------------------------------------------------}
+// Entry Conditions
+//-----------------------------------------------------------------------------{
+// Long: breakout + uptrend + trending + RSI not overbought
+longCondition = upperBreak and allowLong
+if useTrendFilter
+    longCondition := longCondition and inUptrend
+if useAdxFilter
+    longCondition := longCondition and isTrending
+if useRsiFilter
+    longCondition := longCondition and rsiLongOk
+
+// Short: breakdown + downtrend + trending + RSI not oversold
+shortCondition = lowerBreak and allowShort
+if useTrendFilter
+    shortCondition := shortCondition and inDowntrend
+if useAdxFilter
+    shortCondition := shortCondition and isTrending
+if useRsiFilter
+    shortCondition := shortCondition and rsiShortOk
+
+//-----------------------------------------------------------------------------}
+// Strategy Execution
+//-----------------------------------------------------------------------------{
+// Track stop levels
+var float longSL  = na
+var float shortSL = na
+var float trailHigh = na
+var float trailLow  = na
+
+// === LONG ENTRY ===
+if longCondition and strategy.position_size == 0
+    strategy.entry("Long", strategy.long)
+    longSL := close - atrValue * atrSlMult
+    trailHigh := high
+
+// === SHORT ENTRY ===
+if shortCondition and strategy.position_size == 0
+    strategy.entry("Short", strategy.short)
+    shortSL := close + atrValue * atrSlMult
+    trailLow := low
+
+// === LONG EXIT MANAGEMENT ===
+if strategy.position_size > 0
+    // Update trailing high
+    trailHigh := math.max(nz(trailHigh, high), high)
+    trailStop = trailHigh - atrValue * trailAtrMult
+
+    // Determine active stop
+    activeStop = longSL
+    if useTrailing and trailStop > longSL
+        activeStop := trailStop
+
+    // Apply stop
+    if useStopLoss
+        strategy.exit("Long SL/Trail", "Long", stop=activeStop)
+
+    // Signal-based exit: bearish break closes long
+    if lowerBreak
+        strategy.close("Long", comment="Signal Exit")
+
+// === SHORT EXIT MANAGEMENT ===
+if strategy.position_size < 0
+    // Update trailing low
+    trailLow := math.min(nz(trailLow, low), low)
+    trailStop = trailLow + atrValue * trailAtrMult
+
+    // Determine active stop
+    activeStop = shortSL
+    if useTrailing and trailStop < shortSL
+        activeStop := trailStop
+
+    // Apply stop
+    if useStopLoss
+        strategy.exit("Short SL/Trail", "Short", stop=activeStop)
+
+    // Signal-based exit: bullish break closes short
+    if upperBreak
+        strategy.close("Short", comment="Signal Exit")
+
+//-----------------------------------------------------------------------------}
+// Plots
+//-----------------------------------------------------------------------------{
+// Trendlines
+plot(upper - slope_ph * length, 'Upper Trendline', color=ph ? na : upCss, linewidth=2, style=plot.style_linebr)
+plot(lower + slope_pl * length, 'Lower Trendline', color=pl ? na : dnCss, linewidth=2, style=plot.style_linebr)
+
+// EMAs
+plot(useTrendFilter ? emaFast : na, 'EMA Fast', color=color.new(color.orange, 30), linewidth=1)
+plot(useTrendFilter ? emaSlow : na, 'EMA Slow', color=color.new(color.blue, 30), linewidth=1)
+
+// Breakout signals (only when filters pass)
+plotshape(longCondition ? low : na, "Long Signal",
+  shape.labelup, location.absolute, upCss,
+  text="L", textcolor=color.white, size=size.tiny)
+
+plotshape(shortCondition ? high : na, "Short Signal",
+  shape.labeldown, location.absolute, dnCss,
+  text="S", textcolor=color.white, size=size.tiny)
+
+// Filtered out signals (dimmed)
+filteredLong  = upperBreak and not longCondition
+filteredShort = lowerBreak and not shortCondition
+
+plotshape(filteredLong ? low : na, "Filtered Long",
+  shape.xcross, location.absolute, color.new(upCss, 70),
+  size=size.tiny)
+
+plotshape(filteredShort ? high : na, "Filtered Short",
+  shape.xcross, location.absolute, color.new(dnCss, 70),
+  size=size.tiny)
+
+// ADX & RSI info table
+var table infoTable = table.new(position.top_right, 2, 4, bgcolor=color.new(color.black, 80))
+
+if barstate.islast
+    table.cell(infoTable, 0, 0, "ADX",      text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 0, str.tostring(adxValue, "#.0") + (isTrending ? " ✓" : " ✗"),
+               text_color=isTrending ? color.green : color.red, text_size=size.small)
+    table.cell(infoTable, 0, 1, "RSI",      text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 1, str.tostring(rsiValue, "#.0"),
+               text_color=rsiValue > rsiOB ? color.red : rsiValue < rsiOS ? color.green : color.white, text_size=size.small)
+    table.cell(infoTable, 0, 2, "Trend",    text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 2, inUptrend ? "UP" : inDowntrend ? "DOWN" : "FLAT",
+               text_color=inUptrend ? color.green : color.red, text_size=size.small)
+    table.cell(infoTable, 0, 3, "Position", text_color=color.white, text_size=size.small)
+    table.cell(infoTable, 1, 3, strategy.position_size > 0 ? "LONG" : strategy.position_size < 0 ? "SHORT" : "FLAT",
+               text_color=strategy.position_size > 0 ? color.green : strategy.position_size < 0 ? color.red : color.gray, text_size=size.small)
+
+//-----------------------------------------------------------------------------}
+// Alerts
+//-----------------------------------------------------------------------------{
+alertcondition(longCondition,  'V2 Long Signal',  'Trendline bullish breakout confirmed (EMA+ADX+RSI)')
+alertcondition(shortCondition, 'V2 Short Signal', 'Trendline bearish breakout confirmed (EMA+ADX+RSI)')
+alertcondition(upperBreak,     'Raw Upper Break',  'Price broke down-trendline (unfiltered)')
+alertcondition(lowerBreak,     'Raw Lower Break',  'Price broke up-trendline (unfiltered)')
+//-----------------------------------------------------------------------------}
