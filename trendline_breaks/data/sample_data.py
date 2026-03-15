@@ -83,3 +83,66 @@ def generate_sample_qqqh(bars: int = 500, seed: int = 42) -> pd.DataFrame:
     }, index=pd.DatetimeIndex(timestamps, name="Datetime"))
 
     return df
+
+
+def generate_sample_btcusdt(bars: int = 720, seed: int = 99) -> pd.DataFrame:
+    """
+    Generate realistic BTCUSDT-like hourly OHLCV data.
+
+    Simulates ~1 month of 24/7 crypto hourly candles with higher volatility,
+    sharper moves, and longer wicks typical of BTC.
+    """
+    np.random.seed(seed)
+
+    base_price = 84000.0
+
+    returns = []
+    regime = 0
+    volatility = 0.005
+
+    for i in range(bars):
+        if i % 60 == 0:
+            regime = np.random.choice([-1, 0, 1], p=[0.3, 0.3, 0.4])
+            volatility = np.random.uniform(0.003, 0.008)
+
+        drift = regime * 0.0004
+        ret = drift + np.random.normal(0, volatility)
+        # Occasional spikes (crypto flash moves)
+        if np.random.random() < 0.02:
+            ret += np.random.choice([-1, 1]) * np.random.uniform(0.01, 0.025)
+        returns.append(ret)
+
+    close = np.zeros(bars)
+    close[0] = base_price
+    for i in range(1, bars):
+        close[i] = close[i - 1] * (1 + returns[i])
+
+    high = np.zeros(bars)
+    low = np.zeros(bars)
+    open_ = np.zeros(bars)
+    volume = np.zeros(bars)
+
+    open_[0] = close[0] * 0.999
+    for i in range(1, bars):
+        open_[i] = close[i - 1] + np.random.normal(0, 20)
+
+    for i in range(bars):
+        spread = abs(close[i] - open_[i])
+        wick_up = np.random.exponential(max(spread * 0.6, 50))
+        wick_down = np.random.exponential(max(spread * 0.6, 50))
+        high[i] = max(open_[i], close[i]) + wick_up
+        low[i] = min(open_[i], close[i]) - wick_down
+        volume[i] = int(np.random.lognormal(10, 1.0))
+
+    # 24/7 crypto market - continuous hourly candles
+    timestamps = pd.date_range(start="2026-02-15", periods=bars, freq="h")
+
+    df = pd.DataFrame({
+        "Open": open_,
+        "High": high,
+        "Low": low,
+        "Close": close,
+        "Volume": volume.astype(int),
+    }, index=pd.DatetimeIndex(timestamps, name="Datetime"))
+
+    return df
